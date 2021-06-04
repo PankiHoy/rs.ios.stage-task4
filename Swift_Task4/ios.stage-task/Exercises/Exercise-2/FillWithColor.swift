@@ -3,7 +3,7 @@ import Foundation
 final class FillWithColor {
     
     func fillWithColor(_ image: [[Int]], _ row: Int, _ column: Int, _ newColor: Int) -> [[Int]] {
-        if (image[row][column] == newColor) {
+        if (row < 0 || column < 0 || row >= image.count || column >= image[0].count || image[row][column] == newColor) {
             return image
         }
         
