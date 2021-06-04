@@ -166,9 +166,9 @@
 		8273B53E2668FDF200717D50 /* ios.stage-taskTests */ = {
 			isa = PBXGroup;
 			children = (
-				821822A426691CCE00F55DC7 /* StationTests.swift */,
 				8218228A266903F400F55DC7 /* IntToRomanTests.swift */,
 				82182288266903ED00F55DC7 /* FillWithColorTests.swift */,
+				821822A426691CCE00F55DC7 /* StationTests.swift */,
 				8273B5412668FDF200717D50 /* Info.plist */,
 			);
 			path = "ios.stage-taskTests";
