@@ -40,35 +40,42 @@ extension CallStation: Station {
                 let call = Call(id: UUID.init(), incomingUser: sender, outgoingUser: reciever, status: .calling)
                 callsArray.append(call)
             }
-
-            return callsArray[callsArray.firstIndex(where: { $0.incomingUser == sender && $0.outgoingUser == reciever })!].id
             
+            if let index = callsArray.firstIndex(where: { $0.incomingUser == sender && $0.outgoingUser == reciever }) {
+                return callsArray[index].id
+            }
+            
+            return nil
             
         case let .answer(from: user):
             if !usersArray.contains(user) {
-                if callsArray.firstIndex(where: { $0.outgoingUser == user }) != nil {
-                    callsArray[callsArray.firstIndex(where: { $0.outgoingUser == user })!].status = .ended(reason: .error)
+                if let index = callsArray.firstIndex(where: { $0.outgoingUser == user }) {
+                    callsArray[index].status = .ended(reason: .error)
                 }
                 return nil
             }
             
             let callId = calls(user: user).first?.id
-            if callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status == .calling {
-                callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status = .talk
+            
+            if let index = callsArray.firstIndex(where: { $0.id == callId }) {
+                if callsArray[index].status == .calling {
+                    callsArray[index].status = .talk
+                }
             }
             
             return callId
-            
             
         case let .end(from: user):
             let callId = calls(user: user).first?.id
             
             if callsArray.contains(where: { $0.id == callId }) {
-                if callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status == .calling {
-                    callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status = .ended(reason: .cancel)
-                }
-                if callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status == .talk {
-                    callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status = .ended(reason: .end)
+                if let index = callsArray.firstIndex(where: { $0.id == callId }) {
+                    if callsArray[index].status == .calling {
+                        callsArray[index].status = .ended(reason: .cancel)
+                    }
+                    if callsArray[index].status == .talk {
+                        callsArray[index].status = .ended(reason: .end)
+                    }
                 }
             }
             
