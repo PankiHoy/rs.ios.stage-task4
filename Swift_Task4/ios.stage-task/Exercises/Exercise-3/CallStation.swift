@@ -3,12 +3,11 @@ import Foundation
 final class CallStation {
     var usersArray = [User]()
     var callsArray = [Call]()
-    
 }
 
 extension CallStation: Station {
     func users() -> [User] {
-        return usersArray
+        usersArray
     }
     
     func add(user: User) {
@@ -24,22 +23,82 @@ extension CallStation: Station {
     }
     
     func execute(action: CallAction) -> CallID? {
-        return nil
+        switch action {
+        case let .start(from: sender, to: reciever):
+            if !usersArray.contains(sender) && !usersArray.contains(reciever) {
+                return nil
+            } else if !usersArray.contains(reciever) {
+                let call = Call(id: UUID.init(), incomingUser: sender, outgoingUser: reciever, status: .ended(reason: .error))
+                callsArray.append(call)
+                return call.id
+            }
+            
+            if self.currentCall(user: reciever) != nil {
+                let call = Call(id: UUID.init(), incomingUser: sender, outgoingUser: reciever, status: .ended(reason: .userBusy))
+                callsArray.append(call)
+            } else {
+                let call = Call(id: UUID.init(), incomingUser: sender, outgoingUser: reciever, status: .calling)
+                callsArray.append(call)
+            }
+
+            return callsArray[callsArray.firstIndex(where: { $0.incomingUser == sender && $0.outgoingUser == reciever })!].id
+            
+            
+        case let .answer(from: user):
+            let callId = calls(user: user).first?.id
+            if callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status == .calling {
+                callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status = .talk
+            }
+            
+            return callId
+            
+            
+        case let .end(from: user):
+            let callId = calls(user: user).first?.id
+            
+            if callsArray.contains(where: { $0.id == callId }) {
+                if callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status == .calling {
+                    callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status = .ended(reason: .cancel)
+                }
+                if callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status == .talk {
+                    callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status = .ended(reason: .end)
+                }
+            }
+            
+            return callId
+        }
     }
     
     func calls() -> [Call] {
-        return callsArray
+        callsArray
     }
     
     func calls(user: User) -> [Call] {
-        return []
+        var calls = [Call]()
+        for call in callsArray {
+            if call.incomingUser == user || call.outgoingUser == user {
+                calls.append(call)
+            }
+        }
+        return calls
     }
     
     func call(id: CallID) -> Call? {
-        nil
+        for call in callsArray {
+            if call.id == id {
+                return call
+            }
+        }
+        return nil
     }
     
     func currentCall(user: User) -> Call? {
-        nil
+        for call in callsArray {
+            if (call.outgoingUser == user || call.incomingUser == user) && (call.status == .calling || call.status == .talk) {
+                return call
+            }
+        }
+        return nil
     }
 }
+

@@ -6,7 +6,6 @@ final class FillWithColor {
         if (row < 0 || column < 0 || row >= image.count || column >= image[0].count || image[row][column] == newColor) {
             return image
         }
-        
         var final = image
         floodFill(&final, row, column, newColor, image[row][column])
         
