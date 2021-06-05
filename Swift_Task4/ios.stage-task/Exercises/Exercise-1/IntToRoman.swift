@@ -10,9 +10,9 @@ public extension Int {
             let unitsRoman = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"]
             
             let thousands = self/1000
-            let hundreds = (self%1000)/100
-            let tens = (self%100)/10
-            let units = (self%10)
+            let hundreds = (self % 1000)/100
+            let tens = (self % 100)/10
+            let units = (self % 10)
             
             return thousandsRoman[thousands] +
                 hundredsRoman[hundreds] +
