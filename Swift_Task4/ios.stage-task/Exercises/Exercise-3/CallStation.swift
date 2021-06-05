@@ -45,6 +45,13 @@ extension CallStation: Station {
             
             
         case let .answer(from: user):
+            if !usersArray.contains(user) {
+                if callsArray.firstIndex(where: { $0.outgoingUser == user }) != nil {
+                    callsArray[callsArray.firstIndex(where: { $0.outgoingUser == user })!].status = .ended(reason: .error)
+                }
+                return nil
+            }
+            
             let callId = calls(user: user).first?.id
             if callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status == .calling {
                 callsArray[callsArray.firstIndex(where: { $0.id == callId })!].status = .talk
